@@ -5,14 +5,14 @@ import ast
 import requests
 import numpy as np
 from openai import OpenAI
-from config import openai_apikey
-from config import google_apikey
+from config import openai_apikey, google_apikey, ao_apikey
 
 # AO
 import ao_pyth as ao # $ pip install ao_pyth - https://pypi.org/project/ao-pyth/
 # import ao_core as ao # private package, to run our code locally, useful for advanced debugging; ao_pyth is enough for most use cases
-from config import ao_apikey
 
+
+                                    # ----------- Helper Functions -----------#
 
 def llm_call(input_message): #llm call method 
     client = OpenAI(api_key = openai_apikey)
@@ -50,24 +50,29 @@ def convert_to_binary(input_to_agent_scaled, scale=10):
     return input_to_agent
 
 
+
+
+
+                                    # ----------- Initialize AO Agent -----------#
+
 # Initialize AO agent architecture, here we with 30 input neurons and 5 output neurons. 
-
 # Input consists of 3 features, each given on a likelihood scale of 0-10):
-# 
-# -- come up with more input types/channels of data!
-#
 # The 5 output neurons correspond to the likelihood of infringement (scale 1-5).
-#
-arch = ao.Arch(arch_i="[10, 10, 10]", arch_z="[5]", api_key=ao_apikey, kennel_id="loop1-demo_01") 
+arch = ao.Arch(arch_i="[10, 10, 10]", arch_z="[5]", api_key=ao_apikey, kennel_id="loop1-demo_01") # --> architecture setup
+agent = ao.Agent(arch, uid="agent_01", save_meta=True)  # --> agent creation
+agent.api_reset_compatibility = True
 
 
-# Create an agent with the given architecture
-agent = ao.Agent(arch, uid="agent_01", save_meta=True)
-agent.api_reset_compatibility = True # to enable similar behavior in local core with reset states as ao_python when running cross-compatible scripts
 
 
-# Setting a baseline by pre-training example patterns that are known to be fraudulent. 
-# -> Likelihood of fraud (scale 1-5)
+
+
+
+
+                                    # ----------- Pre-train with Baseline Examples -----------#
+# Optional - Use this to train the agent on baseline (if the agent has no prior training, it would output random.
+# if it only has 1 label/training event, it can only ever output that until trained on more examples)
+
 training_data = [
     ([10, 10, 10], [5]),
     ([8, 4, 0], [3]),
@@ -76,32 +81,49 @@ training_data = [
     ([0, 0, 0], [0]),
 
 ]
-##### Optional - uncomment to train the agent on baseline (if the agent has no prior training, it would output random; if it only has 1 label/training event, it can only ever output that until trained on more examples)
 for inp, label in training_data:
     inp = convert_to_binary(inp, scale=10)
     label = convert_to_binary(label, scale=5)
     agent.next_state(INPUT=inp, LABEL=label, unsequenced=True)  # Reset states are added automatically if unsequenced=True and when agent.api_reset_compatibility is True
 
+
+
+
+
+
+
+                                    # ----------- Inference on YouTube Content -----------#
 yt_description = get_youtube_data("SUBk89F3giM")
 
 # Extracting features for input (using an LLM here - we can use other APIs)
-input_to_agent_scaled = ast.literal_eval(llm_call(f"""
+
+llm_prompt = f"""
 Analyze the following YouTube description: {yt_description}.
 
-Provide a list of three numbers (1-10) representing: 1) the likelihood the content is re-posted from a cross-platform source, 2) the likelihood the content is a compilation of other content, 3) the likelihood the content is an advertisement. Base your ratings on the text provided, considering keywords, phrasing, and context. Return only the three numbers, no explanation."
-                       """))
+Provide a list of three numbers (1-10) representing:
+1) Likelihood of re-posted content
+2) Likelihood of compilation content
+3) Likelihood of being an advertisement
+
+Return only the three numbers as a list.
+"""
+input_to_agent_scaled = ast.literal_eval(llm_call(llm_prompt))
 print("LLM response: ", input_to_agent_scaled)
 print(type(input_to_agent_scaled))
 # converting input to binary
 input_to_agent = convert_to_binary(input_to_agent_scaled, scale=10)
 
 
-# Predicting the likelihood of infringement based on the binary input
+# # Initial prediction, predicting the likelihood of infringement based on the binary input
 agent_response = agent.next_state(input_to_agent, unsequenced=True)
 print("Agent raw binary response: ", agent_response)
 print("Response percentage: ", sum(agent_response) / len(agent_response) * 100, "%")
 
 
+
+
+
+                                    # ----------- Feedback Loop -----------#
 # Closing the Learning Loop - passing feedback to the system to drive learning
 res = input("Closing the Learning Loop-- was this input-pattern actually infringement (Y or N)?  ")
 if res == "Y":
@@ -109,12 +131,17 @@ if res == "Y":
 else:
     agent.next_state(input_to_agent, LABEL=[0, 0, 0, 0, 0], unsequenced=True)
 
-
-# To verify the learning, predict infringement again on the SAME input-pattern
+# Re-evaluate After Feedback. To verify the learning, predict infringement again on the SAME input-pattern
 agent_response = agent.next_state(input_to_agent, unsequenced=True)
 print("Agent raw binary response: ", agent_response)
 print("AFTER LEARNING, response percentage: ", sum(agent_response) / len(agent_response) * 100, "%")
 
+
+
+
+
+
+                                      # ----------- Additional Test Input -----------#
 
 
 # Testing with arbitrary inference calls (or include a LABEL argument to train)
