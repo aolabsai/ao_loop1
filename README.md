@@ -1,7 +1,7 @@
 # ao_loop1
 Open source reference design for implementing Loop-1, an API for real-time reinforcement learning
 
-Maintainer: [aolabsai], eng@aolabs.ai
+Maintainer: aolabsai, eng@aolabs.ai
 
 This is a reference implementation showing how to use an AO weightless neural network agent (`ao_pyth`) for real-time inference and learning over user-specified tasks. The agent takes input as binary and outputs in binary only. 
 
@@ -43,6 +43,4 @@ You can customize the feature extraction step to suit your task (e.g., extractin
 
 Install dependencies with:
 
-```bash
-pip install -r requirements.txt
 
