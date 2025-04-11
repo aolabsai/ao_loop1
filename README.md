@@ -5,7 +5,7 @@ Maintainer: aolabsai, eng@aolabs.ai
 
 This is a reference implementation showing how to use an AO weightless neural network agent (`ao_pyth`) for real-time inference and learning over user-specified tasks. The agent takes input as binary and outputs in binary only. 
 
-This repo includes a skeleton that can be easily modified wide range of classification problem—just transform your input features to binary form and feed them into the agent.
+This repo includes a skeleton that can be easily modified to a wide range of classification problem—just transform your input features to binary form and feed them into the agent.
 
 ---
 
