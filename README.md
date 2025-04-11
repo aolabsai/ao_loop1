@@ -41,6 +41,4 @@ You can customize the feature extraction step to suit your task (e.g., extractin
 - `requests`
 - `ast`, `openai` (if using LLMs for feature extraction)
 
-Install dependencies with:
-
 
