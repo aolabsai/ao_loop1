@@ -1,17 +1,10 @@
 # -*- coding: utf-8 -*-
-"""
-// aolabs.ai software >ao_core/Arch.py (C) 2023 Animo Omnis Corporation. All Rights Reserved.
-
-Thank you for your curiosity!
-"""
-
-
 ## // MNIST Agent -- Reference Design #1
 # 
 # A 1D application of an Agent trained on small samples of MNIST: https://en.wikipedia.org/wiki/MNIST_database
 # 
 # We've gotten Agents with between 20-60%+ accuracy having trained on only 120 training examples (instead of the full 60,000),
-# the variance depends on how their neurons are connected (fully connecting an Agent with neurons of this mangnitude was prohbitive for our small machines 
+# the variance depends on how their neurons are connected (fully connecting an Agent with neurons of this magnitude was prohibitive for our small machines 
 # and unoptimized code, hence the "rand_conn" connector function)
 #
 # For interactive visual representation of this Arch:
@@ -23,6 +16,8 @@ Thank you for your curiosity!
 import ao_pyth as ao
 
 api_key = "my_key"
+email = "yours@email.com"
+
 
 #downsampled MNIST 
 description = "788-neuron MNIST Agent for benchmarking"      #    MNIST is in grayscale, which we downscaled to B&W for the simple 28x28 neuron count -- 788 = 28x28 + 4
@@ -34,6 +29,6 @@ connector_parameters = [360, 180, 784, 4]
 # so all Q neurons are connected randomly to 360 I and 180 neighbor Q
 #and all Z neurons are connected randomly to 784 Q and 4 (or all) neighbor Z
 
-arch = ao.Arch(arch_i, arch_z, arch_c, connector_function, connector_parameters, description, api_key=api_key)
+arch = ao.Arch(arch_i, arch_z, arch_c, connector_function, connector_parameters, description, api_key=api_key, email=email)
 
 # varying these architecture details has been explored in this WIP aolabs research paper: https://docs.google.com/document/d/1p3FvYYPsD9XunJg2Dfaw0wLvnxIUspPsMvBi8acp0EI/edit
