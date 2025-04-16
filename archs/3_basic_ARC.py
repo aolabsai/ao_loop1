@@ -15,6 +15,7 @@ Thank you for your curiosity!
 #
 # Customize and upload this Arch to our API to create Agents: https://docs.aolabs.ai/reference/kennelcreate
 #
+import ao_pyth as ao
 
 
 description = "Basic ARC - an agent for the ARC-AGI benchmark"
@@ -28,5 +29,4 @@ arch_c = []           # adding 1 control neuron which we'll define with the inst
 connector_function = "nearest_neighbour_conn"
 connector_parameters = [1, 1, 3, 3, False]
 
-# To maintain compatibility with our API, do not change the variable name "Arch" or the constructor class "ar.Arch" in the line below
-Arch = ar.Arch(arch_i, arch_z, arch_c, connector_function, connector_parameters, description)
+arch = ao.Arch(arch_i, arch_z, arch_c, connector_function, connector_parameters, description)

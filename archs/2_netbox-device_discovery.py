@@ -5,6 +5,8 @@
 Thank you for your curiosity!
 """
 
+import ao_pyth as ao
+
 
 ## // Netbox- Device Discovery -- Reference Design #2
 # 
@@ -27,6 +29,5 @@ connector_function = "forward_full_conn"
 # device mfg, type, and site are stored as strings (names) with associated unique IDs
 # using 10 binary neurons to encode integer IDs means we can encode up to 2^10 = 1048 unique binary values.
 
-# To maintain compatibility with our API, do not change the variable name "Arch" or the constructor class "ar.Arch" in the line below
-Arch = ar.Arch(arch_i, arch_z, arch_c, connector_function, description)
+arch = ao.Arch(arch_i, arch_z, arch_c, connector_function, description)
 

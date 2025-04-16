@@ -15,6 +15,7 @@ Thank you for your curiosity!
 #
 # Customize and upload this Arch to our API to create Agents: https://docs.aolabs.ai/reference/kennelcreate
 #
+import ao_core as ao
 
 
 description = "Basic Clam"
@@ -23,8 +24,7 @@ arch_z = [1]           # corresponding to Open=1/Close=0
 arch_c = [1]           # adding 1 control neuron which we'll define with the instinct control function below
 connector_function = "full_conn"
 
-# To maintain compatibility with our API, do not change the variable name "Arch" or the constructor class "ar.Arch" in the line below
-Arch = ar.Arch(arch_i, arch_z, arch_c, connector_function, description)
+arch = ao.Arch(arch_i, arch_z, arch_c, connector_function, description)
 
 # Adding Instinct Control Neuron
 def c0_instinct_rule(INPUT, Agent):
@@ -34,4 +34,6 @@ def c0_instinct_rule(INPUT, Agent):
         instinct_response = [0, "c0 pass"]    
     return instinct_response            
 # Saving the function to the Arch so the Agent can access it
-Arch.datamatrix[4, Arch.C[1][0]] = c0_instinct_rule
+arch.datamatrix[4, arch.C[1][0]] = c0_instinct_rule
+
+agent = ao.Agent(arch)
