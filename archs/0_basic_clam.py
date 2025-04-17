@@ -9,10 +9,7 @@
 # Customize and upload this Arch to our API to create Agents: https://docs.aolabs.ai/reference/kennelcreate
 #
 
-import ao_pyth as ao
-
-api_key = "my_key"
-email = "yours@email.com"
+import ao_core as ao # this arch uses custom instinct learning functions not yet supported in our API
 
 
 description = "Basic Clam"
@@ -22,7 +19,7 @@ arch_c = [1]           # adding 1 control neuron which we'll define with the ins
 connector_function = "full_conn"
 connector_parameters = []
 
-arch = ao.Arch(arch_i, arch_z, arch_c, connector_function, connector_parameters, description, api_key=api_key, email=email)
+arch = ao.Arch(arch_i, arch_z, arch_c, connector_function, connector_parameters, description)
 
 # Adding Instinct Control Neuron
 def c0_instinct_rule(INPUT, Agent):
